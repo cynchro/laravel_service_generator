@@ -36,7 +36,7 @@ class GenerateService extends Command
 
     private function generateContent($modelName, $className)
     {
-        $stubPath = base_path('packages/bacoder/servicesgenerator/stubs/services/service.stub');
+        $stubPath = base_path('vendor/bacoder/servicesgenerator/stubs/services/service.stub');
         $stubContent = File::get($stubPath);
         $content = str_replace(
             ['{{ModelName}}', '{{ClassName}}', '{{modelName}}'],
