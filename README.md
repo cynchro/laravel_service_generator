@@ -1,4 +1,4 @@
-## This package automatically generates basic services and controller to work with Laravel models, the way to use it is
+## This package automatically generates basic services to work with Laravel models, the way to use it is
 
 on www/html/app/Console/Kernel.php 
 
