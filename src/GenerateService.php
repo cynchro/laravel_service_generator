@@ -26,7 +26,9 @@ class GenerateService extends Command
         File::ensureDirectoryExists(app_path('Http/Controllers'));
         File::put($controllerFilePath, $controllerContent);
 
-        $this->info("The service class '{$className}Service' and the controller class '{$className}Controller' have been generated successfully.");
+        $this->addRoutes($className);
+
+        $this->info("The service class '{$className}Service', controller class '{$className}Controller', and routes have been generated successfully.");
     }
 
     private function generateModelName($model)
@@ -65,5 +67,28 @@ class GenerateService extends Command
         $content = str_replace(array_keys($replacements), array_values($replacements), $stubContent);
 
         return $content;
+    }
+
+    private function addRoutes($className)
+    {
+        $apiRoutesPath = base_path('routes/api.php');
+        $routesContent = File::get($apiRoutesPath);
+
+        $routesToAdd = [
+            "",
+            "/** {$className} Routes **/",
+            "",
+            "Route::get('/" . strtolower($className) . "', [{$className}Controller::class, 'index']);",
+            "Route::get('/" . strtolower($className) . "/{id}', [{$className}Controller::class, 'show']);",
+            "Route::post('/" . strtolower($className) . "', [{$className}Controller::class, 'create']);",
+            "Route::put('/" . strtolower($className) . "/{id}', [{$className}Controller::class, 'update']);",
+            "Route::delete('/" . strtolower($className) . "/{id}', [{$className}Controller::class, 'delete']);",
+        ];
+
+        $routesContent = str_replace("<?php\n\nuse Illuminate\Http\Request;", "<?php\n\nuse Illuminate\Http\Request;\nuse App\Http\Controllers\\{$className}Controller;", $routesContent);
+        $routesContent = preg_replace('/\n\nuse Illuminate\Support\Facades\Route;\n/', "\n\nuse Illuminate\Support\Facades\Route;\n\n", $routesContent);
+        $routesContent .= "\n\n" . implode("\n", $routesToAdd);
+
+        File::put($apiRoutesPath, $routesContent);
     }
 }
